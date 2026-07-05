@@ -1,0 +1,33 @@
+<Window
+    x:Class="WinUIGallery.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:WinUIGallery.Models"
+    Title="WinUI Gallery - Dashboard">
+    <Grid Padding="24" x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Text="WinUI Gallery" Style="{ThemeResource TitleLargeTextBlockStyle}" Margin="0,0,0,16" />
+        <ListView
+            x:Name="CategoryListView"
+            Grid.Row="1"
+            SelectionMode="Single"
+            IsItemClickEnabled="True"
+            ItemClick="CategoryListView_ItemClick">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:ControlInfoDataGroup">
+                    <Grid Padding="8" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind Title}" Style="{ThemeResource BodyStrongTextBlockStyle}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="{x:Bind Items.Count.ToString()}" Style="{ThemeResource CaptionTextBlockStyle}" VerticalAlignment="Center" Opacity="0.7" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Window>

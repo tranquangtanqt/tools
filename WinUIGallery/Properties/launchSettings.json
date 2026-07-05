@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "WinUIGallery Packaged": {
+      "commandName": "MsixPackage",
+      "nativeDebugging": false
+    },
+    "WinUIGallery Unpackaged": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

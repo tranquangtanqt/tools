@@ -1,0 +1,26 @@
+{
+  "Groups": [
+    {
+      "UniqueId": "Button",
+      "Title": "Button",
+      "IconGlyph": "",
+      "Items": [
+        {
+          "UniqueId": "Button",
+          "Tags": ["click", "push button", "command"],
+          "Title": "Button",
+          "BaseClasses": ["Object", "DependencyObject", "UIElement", "FrameworkElement", "Control", "ContentControl", "ButtonBase"],
+          "ApiNamespace": "Microsoft.UI.Xaml.Controls",
+          "Subtitle": "A control that responds to user input and raises a Click event.",
+          "ImagePath": "ms-appx:///Assets/ControlImages/Button.png",
+          "Description": "The Button control provides a Click event to respond to user input from a touch, mouse, keyboard, stylus, or other input device. You can put different kinds of content in a button, such as text or an image, or you can restyle a button to give it a new look.",
+          "SourcePath": "/CommonStyles/Button_themeresources.xaml",
+          "Docs": [
+            { "Title": "Button - API", "Uri": "https://learn.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.button" },
+            { "Title": "Guidelines", "Uri": "https://learn.microsoft.com/windows/apps/design/controls/buttons" }
+          ]
+        }
+      ]
+    }
+  ]
+}

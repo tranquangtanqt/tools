@@ -1,0 +1,40 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="Exists($([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')))" />
+
+  <PropertyGroup>
+    <TargetFramework>$(SamplesTargetFrameworkMoniker)</TargetFramework>
+    <TargetPlatformVersion>$(WindowsSdkTargetPlatformVersion)</TargetPlatformVersion>
+    <TargetPlatformMinVersion>$(WindowsAppSdkTargetPlatformVersion)</TargetPlatformMinVersion>
+    <UseWinUI>true</UseWinUI>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <Nullable>enable</Nullable>
+    <DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
+
+    <!-- Unpackaged-only by decision: no MSIX config anywhere in this tree -->
+    <WindowsPackageType>None</WindowsPackageType>
+    <EnableMsixTooling>false</EnableMsixTooling>
+
+    <!-- AOT compatibility isn't a pilot goal; the CsWinRT AOT optimizer's generic-instantiation
+         codegen doesn't play well with class-library output types (unsafe-code + assembly-version
+         issues), so opt out of it here rather than fighting it for the pilot. -->
+    <IsAotCompatible>false</IsAotCompatible>
+    <CsWinRTAotOptimizerEnabled>false</CsWinRTAotOptimizerEnabled>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Same Company/AssemblyProduct across every project here so that
+         ApplicationData.GetForUnpackaged(Publisher, ProductName) resolves to
+         the SAME local-settings store for Dashboard and every Feature exe. -->
+    <Company>Microsoft</Company>
+    <AssemblyProduct>WinUIGalleryExtended</AssemblyProduct>
+    <Version>1.0.0.0</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <AssemblyFileVersion>$(Version)</AssemblyFileVersion>
+
+    <!-- Every project's output lands under one common sibling-folder root,
+         regardless of where its .csproj sits under src/**, so Process.Start
+         from App.Dashboard can find sibling exes by relative path. -->
+    <BaseOutputPath>$(MSBuildThisFileDirectory)..\artifacts\bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\artifacts\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>

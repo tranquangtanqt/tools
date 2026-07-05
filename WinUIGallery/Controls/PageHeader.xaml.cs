@@ -1,0 +1,147 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using System;
+using WinUIGallery.Helpers;
+using WinUIGallery.Models;
+using Uri = System.Uri;
+
+namespace WinUIGallery.Controls;
+
+public sealed partial class PageHeader : UserControl
+{
+    public Visibility ThemeButtonVisibility
+    {
+        get { return (Visibility)GetValue(ThemeButtonVisibilityProperty); }
+        set { SetValue(ThemeButtonVisibilityProperty, value); }
+    }
+    public static readonly DependencyProperty ThemeButtonVisibilityProperty =
+        DependencyProperty.Register("ThemeButtonVisibility", typeof(Visibility), typeof(PageHeader), new PropertyMetadata(Visibility.Visible));
+
+    public string PageName { get; set; } = string.Empty;
+    public Action? CopyLinkAction { get; set; }
+    public Action? ToggleThemeAction { get; set; }
+
+    public ControlInfoDataItem? Item
+    {
+        get { return _item; }
+        set { _item = value; }
+    }
+
+    private ControlInfoDataItem? _item;
+
+    public PageHeader()
+    {
+        this.InitializeComponent();
+        CopyLinkAction = OnCopyLink;
+    }
+
+    public void SetSamplePageSourceLinks(string BaseUri, string PageName)
+    {
+        // Pagetype is not null!
+        // So lets generate the github links and set them!
+        var pageName = PageName + ".xaml";
+        PageCodeGitHubLink.NavigateUri = new Uri(BaseUri + pageName + ".cs");
+        PageMarkupGitHubLink.NavigateUri = new Uri(BaseUri + pageName);
+    }
+
+    public void SetControlSourceLink(string BaseUri, string SourceLink)
+    {
+        if (!string.IsNullOrEmpty(SourceLink))
+        {
+            ControlSourcePanel.Visibility = Visibility.Visible;
+            ControlSourceSeparator.Visibility = Visibility.Visible;
+            ControlSourceLink.NavigateUri = new Uri(BaseUri + SourceLink);
+        }
+        else
+        {
+            ControlSourcePanel.Visibility = Visibility.Collapsed;
+            ControlSourceSeparator.Visibility = Visibility.Collapsed;
+        }
+
+    }
+
+    public string GetControlSourceInfoText()
+    {
+        string itemTitle = string.IsNullOrWhiteSpace(Item?.Title) ? "this control" : Item.Title;
+        return $"Source code of {itemTitle} in the WinUI repository. For some controls only the XAML file is available";
+    }
+
+    public string GetSamplePageSourceInfoText()
+    {
+        string itemTitle = string.IsNullOrWhiteSpace(Item?.Title) ? "this sample page" : $"the {Item.Title} sample page";
+        return $"Source code of {itemTitle} in the WinUI Gallery repository";
+    }
+
+    private void OnCopyLinkButtonClick(object sender, RoutedEventArgs e)
+    {
+        this.CopyLinkAction?.Invoke();
+
+        if (ProtocolActivationClipboardHelper.ShowCopyLinkTeachingTip)
+        {
+            this.CopyLinkButtonTeachingTip.IsOpen = true;
+        }
+    }
+
+    public void OnThemeButtonClick(object sender, RoutedEventArgs e)
+    {
+        ToggleThemeAction?.Invoke();
+        UIHelper.AnnounceActionForAccessibility(ThemeButton, "Theme changed.", "ThemeChangedSuccessNotificationId");
+    }
+
+    private void OnCopyDontShowAgainButtonClick(TeachingTip sender, object args)
+    {
+        ProtocolActivationClipboardHelper.ShowCopyLinkTeachingTip = false;
+        this.CopyLinkButtonTeachingTip.IsOpen = false;
+    }
+
+    private void OnCopyLink()
+    {
+        if (this.Item is null)
+        {
+            return;
+        }
+
+        ProtocolActivationClipboardHelper.Copy(this.Item);
+    }
+
+    private void UserControl_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (Item == null || (string.IsNullOrEmpty(Item.ApiNamespace) && (Item.BaseClasses == null || Item.BaseClasses.Length == 0)))
+        {
+            APIDetailsBtn.Visibility = Visibility.Collapsed;
+        }
+        if (Item != null)
+        {
+            FavoriteButton.IsChecked = SettingsHelper.Current.Favorites.Contains(Item.UniqueId);
+        }
+    }
+
+    private string GetFavoriteGlyph(bool? isFavorite)
+    {
+        return isFavorite is true ? "\uE735" : "\uE734";
+    }
+
+    private string GetFavoriteToolTip(bool? isFavorite)
+    {
+        return isFavorite is true ? "Remove from favorites" : "Add to favorites";
+    }
+
+    private void FavoriteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is ToggleButton toggleButton && Item != null)
+        {
+            if (toggleButton.IsChecked == true)
+            {
+                SettingsHelper.Current.UpdateFavorites(items => items.AddAsLast(Item.UniqueId));
+            }
+            else
+            {
+                SettingsHelper.Current.UpdateFavorites(items => items.Remove(Item.UniqueId));
+            }
+        }
+    }
+}

@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Sdk Name="Microsoft.Build.CentralPackageVersions" Version="2.0.1" />
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <RootNamespace>WinUIGallery</RootNamespace>
+        <AssemblyName>App.Dashboard</AssemblyName>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <!-- Required for unpackaged WinAppSDK exes to actually launch. -->
+        <WindowsAppSdkSelfContained>true</WindowsAppSdkSelfContained>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Update="SampleSupport\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.WindowsAppSDK" />
+        <ProjectReference Include="..\Shared\Shared.Models\Shared.Models.csproj" />
+        <ProjectReference Include="..\Shared\Shared.Core\Shared.Core.csproj" />
+        <ProjectReference Include="..\Shared\Shared.Services\Shared.Services.csproj" />
+        <ProjectReference Include="..\Shared\Shared.UI\Shared.UI.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IsInWinUIRepo)' != 'true'">
+        <PackageReference Update="Microsoft.WindowsAppSDK" Version="$(WindowsAppSdkPackageVersion)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Manifest Include="$(ApplicationManifest)" />
+    </ItemGroup>
+</Project>

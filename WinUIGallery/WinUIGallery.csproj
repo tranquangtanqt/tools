@@ -1,0 +1,205 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Sdk Name="Microsoft.Build.CentralPackageVersions" Version="2.0.1" />
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>$(SamplesTargetFrameworkMoniker)</TargetFramework>
+        <TargetPlatformVersion>$(WindowsSdkTargetPlatformVersion)</TargetPlatformVersion>
+        <TargetPlatformMinVersion>$(WindowsAppSdkTargetPlatformVersion)</TargetPlatformMinVersion>
+        <UseWinUI>true</UseWinUI>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <Platforms>x86;x64;ARM64</Platforms>
+        <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+        <NoWarn>
+            0108;   <!-- 'x' hides inherited member 'y'. Use the new keyword if hiding was intended. -->
+            8305;    <!-- 'x' is for evaluation purposes only and is subject to change or removal in future updates. -->
+            NU1605;
+            $(NoWarn)
+        </NoWarn>
+        <MSBuildWarningsAsMessages>
+            WMC1501 <!-- x is for evaluation purposes only and is subject to change or removal in future updates. -->
+        </MSBuildWarningsAsMessages>
+        <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+        <Configurations>Debug;Release;Debug-Unpackaged;Release-Unpackaged</Configurations>
+        <Release>true</Release>
+        <Release Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Debug-Unpackaged'">false</Release>
+        <Packaged>true</Packaged>
+        <Packaged Condition="'$(Configuration)' == 'Debug-Unpackaged' Or '$(Configuration)' == 'Release-Unpackaged'">false</Packaged>
+        <Optimized>true</Optimized>
+        <Optimized Condition="'$(Configuration)' == 'Debug-Unpackaged' Or '$(Configuration)' == 'Debug'">false</Optimized>
+        <!-- In .NET 8, serialization is prohibited by default - we can safely use it since we're not dealing with UDTs. -->
+        <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+        <WindowsAppSdkIncludeVersionInfo>true</WindowsAppSdkIncludeVersionInfo>
+        <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+        <DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
+
+        <PublishSingleFile Condition="'$(PublishSingleFile)' == '' and '$(Packaged)' != 'true'">true</PublishSingleFile>
+        <WindowsAppSdkSelfContained Condition="'$(WindowsAppSdkSelfContained)' == '' and '$(PublishSingleFile)' == 'true'">true</WindowsAppSdkSelfContained>
+        <!-- Enable ExplicitlyIncludeVersionInfo workaround by setting WindowsAppSdkSelfContained earlier than the mock package would -->
+        <WindowsAppSdkSelfContained Condition="'$(IsInWinUIRepo)' == 'true' and '$(WindowsAppSdkSelfContained)'==''">true</WindowsAppSdkSelfContained>
+        <ApplicationIcon>Assets\Tiles\GalleryIcon.ico</ApplicationIcon>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <Company>Microsoft</Company>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Packaged)' != 'true'">
+        <EnableMsixTooling>false</EnableMsixTooling>
+        <EnableMsixTooling Condition="'$(PublishSingleFile)'=='true'">true</EnableMsixTooling>
+        <WindowsPackageType>None</WindowsPackageType>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Packaged)' == 'true'">
+        <WindowsPackageType>MSIX</WindowsPackageType>
+        <AppxBundleNameForOutput>WinUIGallery</AppxBundleNameForOutput>
+        <EnableMsixTooling>true</EnableMsixTooling>
+        <SDKIdentifier>Windows</SDKIdentifier>
+        <DefaultLanguage>en-US</DefaultLanguage>
+        <AppxPackage>true</AppxPackage>
+        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+        <AssetTargetFallback>net5.0-windows$(TargetPlatformVersion);net6.0-windows$(TargetPlatformVersion);$(AssetTargetFallback)</AssetTargetFallback>
+        <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+        <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+        <GenerateTestArtifacts>True</GenerateTestArtifacts>
+        <AppxBundlePlatforms>$(Platform)</AppxBundlePlatforms>
+        <AppxBundlePlatforms Condition="'$(BuildAllAppFlavors)' == 'true'">x86|x64|ARM64</AppxBundlePlatforms>
+        <AppxBundle>Always</AppxBundle>
+        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+        <SDKVersion>10.0</SDKVersion>
+        <PfxFile>$(MSBuildProjectDirectory)\..\build\WinUI-Gallery-Test.pfx</PfxFile>
+        <PackageCertificateKeyFile Condition="Exists('$(PfxFile)')">$(PfxFile)</PackageCertificateKeyFile>
+    </PropertyGroup>
+
+    <!-- For Source Generator, if we want to specify specific namespace -->
+    <ItemGroup>
+        <CompilerVisibleProperty Include="NavigationMappingsNamespace" />
+    </ItemGroup>
+
+    <!-- Required for Source Generator -->
+    <ItemGroup>
+        <AdditionalFiles Include="SampleSupport\Data\ControlInfoData.json" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(Packaged)' == 'true'">
+        <AppxManifest Include="Package.appxmanifest" Condition="'$(Release)' == 'true'">
+            <SubType>Designer</SubType>
+        </AppxManifest>
+        <AppxManifest Include="Package.Dev.appxmanifest" Condition="'$(Release)' == 'false'">
+            <SubType>Designer</SubType>
+        </AppxManifest>
+    </ItemGroup>
+
+    <PropertyGroup Condition="'$(IsInWinUIRepo)' == 'true'">
+        <GenerateAppInstallerFile>true</GenerateAppInstallerFile>
+        <!-- URI must be absolute so this is really only useful for testing a locally produced AppInstaller. -->
+        <AppInstallerUri>$(AppxPackageDir)</AppInstallerUri>
+        <!-- False until https://task.ms/31482969 is implemented -->
+        <AppxBundle>Never</AppxBundle>
+    </PropertyGroup>
+
+    <Import Project="Common.props" />
+
+    <ItemGroup>
+        <Content Update="Assets\**" CopyToOutputDirectory="PreserveNewest" />
+        <Content Remove="Assets\**\*.cs" />
+        <None Update="Samples\**\*.txt" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Samples\Iconography\IconsData.json" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="SampleSupport\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+        <Compile Remove="CollectionsInterop.cs" />
+        <Compile Remove="Behaviors\ImageScrollBehavior.cs" />
+        <!-- RichTextBlockFormatter is defined in ColorCode.WinUI outside the WinUI repo -->
+        <Compile Remove="Helpers\ColorCode.internal\RichTextBlockFormatter.cs" Condition="'$(IsInWinUIRepo)' != 'true'" />
+        <Compile Remove="Helpers\ColorCode.internal\ExtensionMethods.cs" Condition="'$(IsInWinUIRepo)' != 'true'" />
+    </ItemGroup>
+
+    <!-- In the WinUI repo, package reference versions are controlled centrally by a Packages.props.  We will
+            just add versionless PackageReferences here.  They will be updated to their actual versions by either the Packages.props file
+            in the WinUI repo, or the next ItemGroup below when standalone. -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Windows.CsWin32">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.WindowsAppSDK" />
+        <PackageReference Include="ColorCode.Core" />
+        <PackageReference Include="Microsoft.Graphics.Win2D" />
+        <PackageReference Include="Microsoft.Windows.CsWinRT" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" />
+        <PackageReference Include="CommunityToolkit.WinUI.Converters" />
+        <PackageReference Include="CommunityToolkit.WinUI.Animations" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" />
+        <Manifest Include="$(ApplicationManifest)" />
+        <!-- System.Private.Uri is pulled in transitively through ColorCode.Core and contains vulnerabilities
+          CVE-2019-0657, CVE-2019-0980, and CVE-2019-0981. Since no meta-package depends on version 4.3.2, which
+          addresses those vulnerabilites, we need to pull it in ourselves. -->
+    <PackageReference Include="System.Private.Uri" />
+	<ProjectReference Include="..\WinUIGallery.SourceGenerator\WinUIGallery.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsInWinUIRepo)' == 'true'">
+    <PackageReference Update="Microsoft.Graphics.Win2D" VersionOverride="$(GraphicsWin2DVersion)" />
+  </ItemGroup>
+	
+  <ItemGroup Condition="'$(IsInWinUIRepo)' != 'true'">
+    <PackageReference Update="Microsoft.WindowsAppSDK" Version="$(WindowsAppSdkPackageVersion)" />
+    <PackageReference Remove="ColorCode.Core" />
+    <PackageReference Include="ColorCode.WinUI" Version="$(ColorCodeVersion)" />
+    <PackageReference Update="CommunityToolkit.WinUI.Controls.SettingsControls" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageReference Update="CommunityToolkit.WinUI.Converters" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageReference Update="CommunityToolkit.WinUI.Animations" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageReference Update="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageReference Update="Microsoft.Graphics.Win2D" Version="$(GraphicsWin2DVersion)" />
+    <!-- Get latest WinRT.Runtime.dll from C#/WinRT -->
+    <PackageReference Update="Microsoft.Windows.CsWinRT" Version="$(MicrosoftCsWinRTPackageVersion)" />
+    <PackageReference Update="System.Private.Uri" Version="4.3.2" />
+    <PackageReference Update="Microsoft.Windows.CsWin32" Version="0.3.269" />
+    <PackageReference Update="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260316102" />
+  </ItemGroup>
+
+    <!--Per comment in Microsoft.Common.CurrentVersion.targets, the default GetCopyToPublishDirectoryItems 
+        just returns GetCopyToOutputDirectoryItems, which automatically includes the ContentWithTargetPath
+        and _NoneWithTargetPath items in the MSIX package.  The .NET GetCopyToPublishDirectoryItems 
+        overrides this and drops all these items unless they're specifically set to copy to the output
+        directory.  The default behavior is easier, so we'll mimic that here.-->
+    <Target Name="AddCopyToPublishDirectoryItems" Condition="'$(PublishSingleFile)'=='true'" BeforeTargets="GetCopyToPublishDirectoryItems" DependsOnTargets="AssignTargetPaths">
+        <ItemGroup>
+            <CurrentContentWithTargetPath Include="@(ContentWithTargetPath)" />
+            <ContentWithTargetPath Remove="@(CurrentContentWithTargetPath )" />
+            <ContentWithTargetPath Include="@(CurrentContentWithTargetPath )">
+                <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            </ContentWithTargetPath>
+            <CurrentNoneWithTargetPath Include="@(_NoneWithTargetPath)" />
+            <_NoneWithTargetPath Remove="@(CurrentNoneWithTargetPath )" />
+            <_NoneWithTargetPath Include="@(CurrentNoneWithTargetPath )">
+                <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            </_NoneWithTargetPath>
+        </ItemGroup>
+    </Target>
+
+  <!--  App Version and Assembly Info  -->
+  <PropertyGroup>
+    <Version>2.9.3.0</Version>
+    <AssemblyTitle>WinUIGallery</AssemblyTitle>
+    <AssemblyProduct>WinUIGallery</AssemblyProduct>
+    <AssemblyCopyright>Copyright © Microsoft Corporation. All rights reserved.</AssemblyCopyright>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <AssemblyFileVersion>$(Version)</AssemblyFileVersion>
+
+        <AppxManifestNamespace>
+            <Namespace Prefix="dn" Uri="http://schemas.microsoft.com/appx/manifest/foundation/windows10" />
+        </AppxManifestNamespace>
+    </PropertyGroup>
+
+    <!--  Updates the version in Package.appxmanifest files.  -->
+    <Target Name="UpdateAppxManifest" BeforeTargets="BeforeBuild">
+        <XmlPoke XmlInputPath="Package.appxmanifest" Query="/dn:Package/dn:Identity/@Version" Namespaces="$(AppxManifestNamespace)" Value="$(Version)" />
+        <XmlPoke XmlInputPath="Package.Dev.appxmanifest" Query="/dn:Package/dn:Identity/@Version" Namespaces="$(AppxManifestNamespace)" Value="$(Version)" />
+    </Target>
+
+</Project>

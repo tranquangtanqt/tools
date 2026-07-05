@@ -1,0 +1,88 @@
+{
+  "Groups": [
+    {
+      "UniqueId": "Navigation",
+      "Title": "Navigation",
+      "IconGlyph": "",
+      "Items": [
+        {
+          "UniqueId": "BreadcrumbBar",
+          "Tags": ["navigation trail", "path"],
+          "Title": "BreadcrumbBar",
+          "BaseClasses": ["Object", "DependencyObject", "UIElement", "FrameworkElement", "Control"],
+          "ApiNamespace": "Microsoft.UI.Xaml.Controls",
+          "Subtitle": "Shows the trail of navigation taken to the current location.",
+          "ImagePath": "ms-appx:///Assets/ControlImages/BreadcrumbBar.png",
+          "Description": "The BreadcrumbBar control provides a common horizontal layout to display the trail of navigation taken to the current location. Resize to see the nodes crumble, starting at the root.",
+          "SourcePath": "/Breadcrumb",
+          "Docs": [
+            { "Title": "BreadcrumbBar - API", "Uri": "https://learn.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.breadcrumbbar" },
+            { "Title": "Guidelines", "Uri": "https://learn.microsoft.com/windows/apps/design/controls/breadcrumbbar" }
+          ]
+        },
+        {
+          "UniqueId": "NavigationView",
+          "Tags": ["hamburger menu", "side nav", "nav pane"],
+          "Title": "NavigationView",
+          "BaseClasses": ["Object", "DependencyObject", "UIElement", "FrameworkElement", "Control", "ContentControl"],
+          "ApiNamespace": "Microsoft.UI.Xaml.Controls",
+          "Subtitle": "Common vertical layout for top-level areas of your app via a collapsible navigation menu.",
+          "ImagePath": "ms-appx:///Assets/ControlImages/NavigationView.png",
+          "Description": "The NavigationView control provides a common vertical layout for top-level areas of your app via a collapsible navigation menu.",
+          "SourcePath": "/NavigationView",
+          "Docs": [
+            { "Title": "NavigationView - API", "Uri": "https://learn.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.Controls.NavigationView" },
+            { "Title": "Guidelines", "Uri": "https://learn.microsoft.com/windows/apps/design/controls/navigationview" }
+          ]
+        },
+        {
+          "UniqueId": "Pivot",
+          "Tags": ["tabs", "tabbed view"],
+          "Title": "Pivot",
+          "BaseClasses": ["Object", "DependencyObject", "UIElement", "FrameworkElement", "Control", "ItemsControl"],
+          "ApiNamespace": "Microsoft.UI.Xaml.Controls",
+          "Subtitle": "Presents information from different sources in a tabbed view.",
+          "ImagePath": "ms-appx:///Assets/ControlImages/Pivot.png",
+          "Description": "Pivot is not recommended for Windows 11 design patterns. Please use the SelectorBar and SelectorBarItem. A Pivot allows you to show a collection of items from different sources in a tabbed view.",
+          "SourcePath": "/CommonStyles/Pivot_themeresources.xaml",
+          "Docs": [
+            { "Title": "Pivot - API", "Uri": "https://learn.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.pivot" },
+            { "Title": "Guidelines", "Uri": "https://learn.microsoft.com/windows/apps/design/controls/pivot" }
+          ]
+        },
+        {
+          "UniqueId": "SelectorBar",
+          "Tags": ["segmented", "tabs"],
+          "Title": "SelectorBar",
+          "BaseClasses": ["Object", "DependencyObject", "UIElement", "FrameworkElement", "Control"],
+          "ApiNamespace": "Microsoft.UI.Xaml.Controls",
+          "Subtitle": "Presents information from a small set of different sources. The user can pick one of them.",
+          "ImagePath": "ms-appx:///Assets/ControlImages/Pivot.png",
+          "Description": "SelectorBar is used to modify the content shown by allowing users to select and switch between a small, finite set of data.",
+          "SourcePath": "/SelectorBar/SelectorBar_themeresources.xaml",
+          "IsNew": true,
+          "Docs": [
+            { "Title": "SelectorBar - API", "Uri": "https://learn.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.selectorbar" },
+            { "Title": "SelectorBarItem - API", "Uri": "https://learn.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.selectorbaritem" }
+          ]
+        },
+        {
+          "UniqueId": "TabView",
+          "Tags": ["tabs", "tabbed", "tab control"],
+          "Title": "TabView",
+          "BaseClasses": ["Object", "DependencyObject", "UIElement", "FrameworkElement", "Control"],
+          "ApiNamespace": "Microsoft.UI.Xaml.Controls",
+          "Subtitle": "A control that displays a collection of tabs that can be used to display several documents.",
+          "ImagePath": "ms-appx:///Assets/ControlImages/TabView.png",
+          "Description": "TabView provides the user with a collection of tabs that can be used to display several documents.",
+          "IsUpdated": true,
+          "SourcePath": "/TabView",
+          "Docs": [
+            { "Title": "TabView - API", "Uri": "https://learn.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.tabview" },
+            { "Title": "Guidelines", "Uri": "https://learn.microsoft.com/windows/apps/design/controls/tab-view" }
+          ]
+        }
+      ]
+    }
+  ]
+}
